@@ -48,6 +48,6 @@ jobs:
       - name: Prepare Yarn 4.9.2
         run: corepack prepare yarn@4.9.2 --activate
 
-      - run: yarn npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.npm_token }}
+      - run: |
+          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+          yarn npm publish --access public
