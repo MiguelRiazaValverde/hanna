@@ -14,15 +14,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Enable corepack BEFORE setup-node cache
+      - name: Enable Corepack
+        run: corepack enable
+
       - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: yarn
 
-      - name: Enable Corepack and prepare Yarn
-        run: |
-          corepack enable
-          corepack prepare yarn@4.9.2 --activate
+      - name: Prepare Yarn 4.9.2
+        run: corepack prepare yarn@4.9.2 --activate
 
       - run: yarn install
       - run: yarn build
@@ -34,17 +36,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Enable Corepack
+        run: corepack enable
+
       - uses: actions/setup-node@v4
         with:
           node-version: 20
           registry-url: https://registry.npmjs.org/
           cache: yarn
 
-      - name: Enable Corepack and prepare Yarn
-        run: |
-          corepack enable
-          corepack prepare yarn@4.9.2 --activate
+      - name: Prepare Yarn 4.9.2
+        run: corepack prepare yarn@4.9.2 --activate
 
       - run: yarn npm publish --access public
         env:
-          NODE_AUTH_TOKEN: ${{secrets.npm_token}}
+          NODE_AUTH_TOKEN: ${{ secrets.npm_token }}
