@@ -8,7 +8,7 @@
   ],
   "scripts": {
     "launch": "npx tsc && node ./dist/index.js",
-    "compile": "npx tsc",
+    "build": "npx tsc",
     "test": "npx tsc && ava"
   },
   "author": "",
@@ -16,7 +16,7 @@
   "description": "",
   "dependencies": {
     "@mongodb-js/socksv5": "^0.0.10",
-    "@pynk/pynk": "0.3.3",
+    "@pynk/pynk": "^0.3.6",
     "socks-proxy-agent": "^8.0.5",
     "socksv5": "0.0.6",
     "tsc": "^2.0.4",
@@ -28,5 +28,6 @@
   },
   "ava": {
     "timeout": "3m"
-  }
+  },
+  "packageManager": "yarn@4.9.2"
 }
