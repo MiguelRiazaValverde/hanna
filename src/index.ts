@@ -12,10 +12,15 @@ import {
     ProxyConfFluent, ProxyFluent, ProxyParams
 } from './proxy';
 import { Stream } from './stream';
+import { Agent, AgentConf, AgentConfFluent, AgentFluent } from './agent';
 
 export {
     pynk,
     fluent,
+    Agent,
+    AgentConf,
+    AgentConfFluent,
+    AgentFluent,
     ClientBuilderFluent,
     ClientConfigFluent,
     Client,

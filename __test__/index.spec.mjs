@@ -2,13 +2,48 @@ import test from 'ava';
 import { fluent, HiddenServiceCallbacks } from '../dist/index.js';
 import * as http from 'http';
 
+test('Agent', async t => {
+
+    const getIp = async agent => {
+        return await new Promise(async (solve, reject) => {
+            http.get({
+                host: 'httpbin.org',
+                path: '/ip',
+                port: 80,
+                agent,
+            }, (res) => {
+                let data = '';
+
+                res.on('data', (chunk) => {
+                    data += chunk;
+                });
+
+                res.on('end', () => {
+                    solve(JSON.parse(data).origin);
+                });
+
+                res.on('error', (err) => {
+                    reject(err);
+                });
+            });
+        });
+
+    };
+
+    const ip = await getIp();
+    const torIp = await getIp(await fluent.agent().materialize());
+
+    console.log(ip, torIp);
+
+    t.truthy(ip !== torIp);
+});
+
 test('_', async t => {
     const server = http.createServer((req, res) => {
-        console.log(`${req.method} ${req.url}`);
         res.writeHead(200, { 'Content-Type': 'text/plain' });
         res.end('Hello, world!\n');
         hiddenService.close();
-        console.log("End service");
+        server.close();
     });
 
     const hiddenService = await fluent
@@ -17,12 +52,10 @@ test('_', async t => {
         .toHiddenServiceConf()
         .callbacks(new class _ extends HiddenServiceCallbacks {
             onStreamRequest(request, hiddenService) {
-                console.log(request.port());
                 return true;
             }
         })
         .handler('*', server)
-        .handler('85', stream => console.log('stream'))
         .toHiddenService()
         .materialize();
 
@@ -31,7 +64,7 @@ test('_', async t => {
     const client = await fluent.client().materialize();
     let stream = await client.connect(hiddenService.address, 85);
 
-    stream.on("data", data => console.log(data.toString('utf8')));
+    // stream.on("data", data => console.log(data.toString('utf8')));
     stream.on("end", () => console.log("end"));
 
     const httpRequest =
