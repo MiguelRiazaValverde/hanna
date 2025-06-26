@@ -9,7 +9,8 @@ import * as http from 'http';
 export class HiddenServiceCallbacks {
     onRendRequest(request: RendRequest, hiddenService: HiddenService): boolean { return true; }
     onStreamRequest(request: StreamRequest, hiddenService: HiddenService): boolean { return true; }
-    onStream(stream: Stream, hiddenService: HiddenService) { }
+    onStream(stream: Stream, hiddenService: HiddenService) {
+    }
 }
 
 
@@ -46,19 +47,20 @@ export class HiddenServiceHandler {
     handle(stream: Stream) {
         if (this.handler instanceof http.Server)
             this.handler.emit("connection", stream);
-        else if (this.handler instanceof Function)
+        else if (this.handler instanceof Function) {
             this.handler(stream);
+        }
     }
 }
 
 export class HiddenService {
 
-
     private constructor(
         public client: Client,
         public hiddenService: OnionService,
         public callbacks: HiddenServiceCallbacks,
-        private handlers: Array<HiddenServiceHandler> = []) {
+        private handlers: Array<HiddenServiceHandler> = []
+    ) {
         this.startPoll();
     }
 
@@ -87,7 +89,8 @@ export class HiddenService {
 
     private async startStreamsPoll(streamsRequest: StreamsRequest) {
         let streamRequest: StreamRequest | null;
-        while (streamRequest = await streamsRequest.poll()) {
+
+        while (streamRequest = await streamsRequest.poll().catch(() => null)) {
             if (this.callbacks.onStreamRequest(streamRequest, this)) {
                 const port = streamRequest.port() || 0;
                 const torStream = await streamRequest.accept();
@@ -109,22 +112,23 @@ export class HiddenService {
                     bestHandler.handle(stream);
                 }
             }
-
         }
     }
 
-    async waitRunning(maxTime?: number): Promise<this> {
+    async waitRunning(maxTime?: number) {
         await this.hiddenService.waitRunning(maxTime);
-        return this;
     }
 
     get address() {
         return this.hiddenService.address();
     }
 
-    async close(): Promise<this> {
+    get state() {
+        return this.hiddenService.state();
+    }
+
+    async close() {
         this.hiddenService.close();
-        return this;
     }
 
     addHandler(portRange: string, handler: http.Server | string | number | ((stream: Stream) => void)): this {
@@ -189,8 +193,7 @@ export class HiddenServiceConfFluent extends Fluent<HiddenServiceConf> {
      * ```ts
      * new HiddenServiceConfFluent().callbacks(new class _ extends HiddenServiceCallbacks {
             onStream(stream: Stream): void {
-                stream.on("data", console.log);
-                stream.write("Hola");
+                stream.write("Hello");
             }
         })
      * ```

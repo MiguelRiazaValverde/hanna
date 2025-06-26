@@ -7,7 +7,7 @@ export class Stream extends Duplex {
     }
 
     private constructor(private stream: TorStream) {
-        super({ objectMode: false });
+        super({ objectMode: false, allowHalfOpen: false });
     }
 
     _read(size: number): void {
@@ -18,9 +18,11 @@ export class Stream extends Duplex {
                     this.push(chunk);
                 } else {
                     this.push(null);
+                    this.destroy();
                 }
             } catch (err) {
                 this.push(null);
+                this.destroy();
             }
         })();
     }
@@ -39,24 +41,20 @@ export class Stream extends Duplex {
     }
 
     _final(callback: (error?: Error | null) => void): void {
-        (async () => {
-            try {
-                await this.stream.close();
-                callback(null);
-            } catch (err) {
-                callback(err as Error);
-            }
-        })();
+        try {
+            this.stream.close();
+            callback(null);
+        } catch (err) {
+            callback(err as Error);
+        }
     }
 
     _destroy(error: Error | null, callback: (error?: Error | null) => void): void {
-        (async () => {
-            try {
-                await this.stream.close();
-                callback(null);
-            } catch (err) {
-                callback(err as Error);
-            }
-        })();
+        try {
+            this.stream.close();
+            super._destroy(error, callback);
+        } catch (err) {
+            callback(err as Error);
+        }
     }
 }
