@@ -1,0 +1,32 @@
+{
+  "name": "@pynk/hanna",
+  "version": "0.0.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "/dist"
+  ],
+  "scripts": {
+    "launch": "npx tsc && node ./dist/index.js",
+    "compile": "npx tsc",
+    "test": "npx tsc && ava"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@mongodb-js/socksv5": "^0.0.10",
+    "@pynk/pynk": "0.3.3",
+    "socks-proxy-agent": "^8.0.5",
+    "socksv5": "0.0.6",
+    "tsc": "^2.0.4",
+    "typescript": "^5.8.3"
+  },
+  "devDependencies": {
+    "@types/node": "24.0.4",
+    "ava": "^6.0.1"
+  },
+  "ava": {
+    "timeout": "3m"
+  }
+}
