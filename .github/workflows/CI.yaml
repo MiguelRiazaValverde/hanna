@@ -48,6 +48,9 @@ jobs:
       - name: Prepare Yarn 4.9.2
         run: corepack prepare yarn@4.9.2 --activate
 
+      - run: yarn install
+      - run: yarn build
+
       - run: |
           echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
           npm publish --access public
