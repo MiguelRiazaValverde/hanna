@@ -17,6 +17,10 @@ jobs:
         with:
           node-version: 20
           cache: yarn
+      - name: Enable Corepack
+        run: corepack enable
+      - name: Activate Yarn 4.9.2
+        run: corepack prepare yarn@4.9.2 --activate
       - run: yarn build
       - run: yarn test
 
@@ -30,7 +34,11 @@ jobs:
           node-version: 20
           registry-url: https://registry.npmjs.org/
           cache: yarn
-      - run: yarn ci --provenance --access public
+      - name: Enable Corepack
+        run: corepack enable
+      - name: Activate Yarn 4.9.2
+        run: corepack prepare yarn@4.9.2 --activate
+      # - run: yarn ci --provenance --access public
       # - run: npm publish
       #   env:
       #     NODE_AUTH_TOKEN: ${{secrets.npm_token}}
