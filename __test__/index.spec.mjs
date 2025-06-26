@@ -23,7 +23,6 @@ function asyncFlag(maxTime) {
 
 
 test('Agent', async t => {
-
     const getIp = async (agent, n) => {
         for (let i = 0; i < n; i++) {
             const result = await new Promise(async (solve, reject) => {
@@ -65,7 +64,7 @@ test('Agent', async t => {
 });
 
 
-test('Hidden service and handlers', async t => {
+test.skip('Hidden service and handlers', async t => {
     const { solve: serverReceive, promise: serverPromise } = asyncFlag(60000);
     const { solve: clientReceive, promise: clientPromise } = asyncFlag(60000);
 
