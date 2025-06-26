@@ -6,11 +6,10 @@ import { Stream } from "./stream";
 import * as http from 'http';
 
 
-export class HiddenServiceCallbacks {
-    onRendRequest(request: RendRequest, hiddenService: HiddenService): boolean { return true; }
-    onStreamRequest(request: StreamRequest, hiddenService: HiddenService): boolean { return true; }
-    onStream(stream: Stream, hiddenService: HiddenService) {
-    }
+export type HiddenServiceCallbacks = {
+    onRendRequest?: (request: RendRequest, hiddenService: HiddenService) => boolean,
+    onStreamRequest?: (request: StreamRequest, hiddenService: HiddenService) => boolean,
+    onStream?: (stream: Stream, hiddenService: HiddenService) => void
 }
 
 
@@ -72,13 +71,13 @@ export class HiddenService {
     ) {
         client = client || await Client.create();
         const onionService = client.client.createOnionService(onionServiceConfig || new OnionServiceConfig());
-        return new HiddenService(client, onionService, callbacks || new HiddenServiceCallbacks(), handlers);
+        return new HiddenService(client, onionService, callbacks || {}, handlers);
     }
 
     private async startPoll() {
         let rendRequest: RendRequest | null;
         while (rendRequest = await this.hiddenService.poll().catch(() => null)) {
-            if (this.callbacks.onRendRequest(rendRequest, this)) {
+            if (this.callbacks.onRendRequest?.(rendRequest, this) ?? true) {
                 const streamsRequest = await rendRequest.accept();
                 streamsRequest && this.startStreamsPoll(streamsRequest);
             } else {
@@ -91,13 +90,13 @@ export class HiddenService {
         let streamRequest: StreamRequest | null;
 
         while (streamRequest = await streamsRequest.poll().catch(() => null)) {
-            if (this.callbacks.onStreamRequest(streamRequest, this)) {
+            if (this.callbacks.onStreamRequest?.(streamRequest, this) ?? true) {
                 const port = streamRequest.port() || 0;
                 const torStream = await streamRequest.accept();
                 if (!torStream)
                     continue;
                 const stream = Stream.create(torStream);
-                this.callbacks.onStream(stream, this);
+                this.callbacks.onStream?.(stream, this);
 
                 let bestHandler: HiddenServiceHandler | null = null;
                 for (const handler of this.handlers) {

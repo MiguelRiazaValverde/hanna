@@ -1,5 +1,5 @@
 import test from 'ava';
-import { fluent, HiddenServiceCallbacks } from '../dist/index.js';
+import { fluent } from '../dist/index.js';
 import * as http from 'http';
 
 
@@ -80,7 +80,7 @@ test('Hidden service and handlers', async t => {
         .onionServiceConf()
         .nickname("hanna-" + Math.floor(Math.random() * 10000))
         .toHiddenServiceConf()
-        .callbacks(new class _ extends HiddenServiceCallbacks { })
+        .callbacks({})
         .handler('*', server)
         .toHiddenService()
         .materialize();
