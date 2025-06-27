@@ -1,4 +1,5 @@
 import * as http from 'http';
+import * as https from 'https';
 import * as stream from 'stream';
 import { Client, ClientFluent } from '.';
 import { Fluent } from './fluent';
@@ -22,8 +23,8 @@ export class Agent extends http.Agent {
             const match = (options.host || options.hostname || "").match(hostnameRe);
             const hostname = match ? match[1] : "";
             try {
-                const stream = await this.client.connect(hostname, parseInt(options.port?.toString() || '0'));
-                onCreate(null, stream);
+                const socket = await this.client.connectSocket(hostname, parseInt(options.port?.toString() || '0'));
+                onCreate(null, socket);
             } catch (err) {
                 onCreate(err instanceof Error ? err : new Error(String(err)), null!);
             }

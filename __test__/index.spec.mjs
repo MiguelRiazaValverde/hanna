@@ -1,6 +1,7 @@
 import test from 'ava';
 import { fluent } from '../dist/index.js';
 import * as http from 'http';
+import axios from 'axios';
 
 
 function asyncFlag(maxTime) {
@@ -20,6 +21,53 @@ function asyncFlag(maxTime) {
         promise
     };
 }
+
+
+test.skip('Hidden service and axios', async t => {
+    const server = http.createServer((req, res) => {
+        res.writeHead(200, { "Content-Type": "text/plain" });
+        res.end("Hello, world!\n");
+        server.close();
+    });
+
+    server.listen(80);
+
+    const hiddenService = await fluent
+        .onionServiceConf()
+        .nickname("hanna")
+        .toHiddenServiceConf()
+        .handler("*", server)
+        .toHiddenService()
+        .materialize();
+
+    await hiddenService.waitRunning();
+
+    console.log("Hidden Service address:", hiddenService.address);
+
+    const agent = await fluent.agent().materialize();
+
+    const axiosResult = await axios.get("http://" + hiddenService.address, {
+        httpAgent: agent,
+    });
+
+    hiddenService.close();
+
+    console.log(axiosResult);
+    t.is(axiosResult.data.includes("Hello, world!"));
+});
+
+
+test('Agent fetch/axios', async t => {
+    const agent = await fluent.agent().materialize();
+
+    const axiosResult = await axios.get('https://httpbin.org/ip', {
+        httpAgent: agent
+    });
+    const fetchResult = await fetch("https://httpbin.org/ip", { agent });
+
+    t.truthy(axiosResult.data.origin);
+    t.truthy((await fetchResult.json()).origin);
+});
 
 
 test('Agent', async t => {
@@ -61,6 +109,30 @@ test('Agent', async t => {
     let torIp = await getIp(await fluent.agent().materialize(), 20) || ip;
 
     t.truthy(ip !== torIp);
+});
+
+
+test.skip('Basic client', async t => {
+    const hostname = 'httpbin.org';
+    const path = '/ip';
+    const client = await fluent.client().materialize();
+    const stream = await client.connect(hostname, 80);
+
+    const request = Buffer.from(
+        `GET ${path} HTTP/1.1\r\nHost: ${hostname}\r\nConnection: close\r\n\r\n`,
+        'utf8'
+    );
+
+    stream.write(request);
+
+    let response = Buffer.alloc(0);
+    stream.on('data', chunk => {
+        response = Buffer.concat([response, chunk]);
+    });
+
+    stream.on('end', () => {
+        console.log(response.toString('utf8'));
+    });
 });
 
 

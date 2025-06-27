@@ -114,8 +114,9 @@ export class HiddenService {
         }
     }
 
-    async waitRunning(maxTime?: number) {
+    async waitRunning(maxTime?: number): Promise<this> {
         await this.hiddenService.waitRunning(maxTime);
+        return this;
     }
 
     get address() {
@@ -126,8 +127,9 @@ export class HiddenService {
         return this.hiddenService.state();
     }
 
-    async close() {
+    close(): this {
         this.hiddenService.close();
+        return this;
     }
 
     addHandler(portRange: string, handler: http.Server | string | number | ((stream: Stream) => void)): this {

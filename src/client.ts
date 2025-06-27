@@ -3,6 +3,8 @@ import { Stream } from "./stream";
 import { ensureInstance } from "./utils";
 import { ClientBuilderFluent } from "./builder";
 import { Fluent } from "./fluent";
+import { Socket } from "./socket";
+import * as tls from "tls";
 
 
 export class Client {
@@ -34,6 +36,32 @@ export class Client {
         const conn = await this.client.connect(`${url}:${port}`);
         if (waitForConnection) await conn.waitForConnection();
         return Stream.create(conn);
+    }
+
+    /**
+     * Launch an anonymized connection to the provided address and port over the Tor network.
+     *
+     * @example
+     * ```ts
+     * const client = await TorClient.create();
+     * const socket = await client.connectSocket("httpbin.org:80");
+     *
+     * // It is recommended to wait for the connection to be fully established
+     * // by calling `waitForConnection()` after `connect()`.
+     * await socket.waitForConnection();
+     * ```
+     */
+    async connectSocket(url: String, port: number, waitForConnection = true, addTLS = true) {
+        let conn = await this.client.connect(`${url}:${port}`);
+        if (waitForConnection) await conn.waitForConnection();
+        // if (addTLS)
+        //     // @ts-ignore
+        //     conn = tls.connect({
+        //         socket: Socket.create(conn),
+        //         rejectUnauthorized: false,
+        //         servername: url, // importante para SNI
+        //     });
+        return Socket.create(conn);
     }
 
     /**
