@@ -1,7 +1,7 @@
 {
   "name": "@pynk/hanna",
   "description": "Hanna makes working with the Tor network in Node.js easy and seamless. Built on top of Pynk, it offers high-level, fluent APIs for launching and interacting with hidden services — no local Tor install required.",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "keywords": [
     "tor",
     "arti",
