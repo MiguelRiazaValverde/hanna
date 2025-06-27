@@ -18,13 +18,13 @@
     "@mongodb-js/socksv5": "^0.0.10",
     "@pynk/pynk": "^0.3.6",
     "socks-proxy-agent": "^8.0.5",
-    "socksv5": "0.0.6",
-    "tsc": "^2.0.4",
-    "typescript": "^5.8.3"
+    "socksv5": "0.0.6"
   },
   "devDependencies": {
     "@types/node": "^24.0.4",
-    "ava": "^6.0.1"
+    "ava": "^6.0.1",
+    "tsc": "^2.0.4",
+    "typescript": "^5.8.3"
   },
   "ava": {
     "timeout": "3m"
