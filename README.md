@@ -12,9 +12,9 @@ While **Pynk** offers minimalistic low-level control over the Tor network, **Han
 
 ## Features
 
-- Simplified and fluent API to start and control Tor clients and circuits
-- Easy management of hidden services and streams
-- Zero dependency on local Tor binaries or installations
+- Simplified and fluent API to start and control Tor clients and circuits.
+- Easy management of hidden services and streams.
+- Zero dependency on local Tor binaries or installations.
 
 ## Installation
 
@@ -22,12 +22,13 @@ While **Pynk** offers minimalistic low-level control over the Tor network, **Han
 npm install @pynk/hanna
 ```
 
-## Drop-in HTTP Anonymity
+## Drop-in HTTP anonymity
 
 Use **Hanna** to get a ready-to-use http.Agent for anonymous requests through the Tor network.
 
 ```js
 import axios from "axios";
+import { fluent } from "@pynk/hanna";
 
 (async () => {
   const agent = await fluent.agent().materialize();
@@ -82,7 +83,7 @@ import { fluent } from "@pynk/hanna";
 })();
 ```
 
-## Example: Hosting and Accessing a Tor Onion Service
+## Example: Hosting and accessing a Tor Onion service
 
 This example demonstrates how to easily create a simple HTTP server and expose it as a Tor onion service using Hanna. It shows how to:
 
