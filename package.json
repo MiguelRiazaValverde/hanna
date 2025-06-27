@@ -1,6 +1,22 @@
 {
   "name": "@pynk/hanna",
-  "version": "0.0.12",
+  "description": "Hanna makes working with the Tor network in Node.js easy and seamless. Built on top of Pynk, it offers high-level, fluent APIs for launching and interacting with hidden services — no local Tor install required.",
+  "version": "0.0.13",
+  "keywords": [
+    "tor",
+    "arti",
+    "onion",
+    "privacy",
+    "anonymous",
+    "pynk",
+    "hanna",
+    "network",
+    "net"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MiguelRiazaValverde/hanna.git"
+  },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
@@ -11,9 +27,7 @@
     "build": "npx tsc",
     "test": "npx tsc && ava"
   },
-  "author": "",
   "license": "ISC",
-  "description": "",
   "dependencies": {
     "@mongodb-js/socksv5": "^0.0.10",
     "@pynk/pynk": "^0.3.6",
