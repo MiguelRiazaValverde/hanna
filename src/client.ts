@@ -51,17 +51,11 @@ export class Client {
      * await socket.waitForConnection();
      * ```
      */
-    async connectSocket(url: String, port: number, waitForConnection = true, addTLS = true) {
+    async connectSocket(url: string, port: number, waitForConnection = true, tls = false) {
         let conn = await this.client.connect(`${url}:${port}`);
         if (waitForConnection) await conn.waitForConnection();
-        // if (addTLS)
-        //     // @ts-ignore
-        //     conn = tls.connect({
-        //         socket: Socket.create(conn),
-        //         rejectUnauthorized: false,
-        //         servername: url, // importante para SNI
-        //     });
-        return Socket.create(conn);
+        if (tls) await conn.enableTls(url);
+        return await Socket.create(conn);
     }
 
     /**

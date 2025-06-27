@@ -2,6 +2,7 @@ import test from 'ava';
 import { fluent } from '../dist/index.js';
 import * as http from 'http';
 import axios from 'axios';
+import fetch from 'node-fetch';
 
 
 function asyncFlag(maxTime) {
@@ -60,17 +61,40 @@ test.skip('Hidden service and axios', async t => {
 test('Agent fetch/axios', async t => {
     const agent = await fluent.agent().materialize();
 
-    const axiosResult = await axios.get('https://httpbin.org/ip', {
+    const axiosResult = await axios.get('http://httpbin.org/ip', {
         httpAgent: agent
     });
-    const fetchResult = await fetch("https://httpbin.org/ip", { agent });
+    const fetchResult = await fetch("http://httpbin.org/ip", { agent });
 
-    t.truthy(axiosResult.data.origin);
-    t.truthy((await fetchResult.json()).origin);
+    const axiosIp = axiosResult.data.origin;
+    const fetchIp = (await fetchResult.json()).origin;
+
+    t.truthy(axiosIp);
+    t.truthy(fetchIp);
+
+    console.log(axiosIp, fetchIp);
 });
 
 
-test('Agent', async t => {
+test('Agent https fetch/axios', async t => {
+    const agent = await fluent.agentHttps().materialize();
+
+    const axiosResult = await axios.get('https://httpbin.org/ip', {
+        httpsAgent: agent
+    });
+    const fetchResult = await fetch("https://httpbin.org/ip", { agent });
+
+    const axiosIp = axiosResult.data.origin;
+    const fetchIp = (await fetchResult.json()).origin;
+
+    t.truthy(axiosIp);
+    t.truthy(fetchIp);
+
+    console.log(axiosIp, fetchIp);
+});
+
+
+test.skip('Agent', async t => {
     const getIp = async (agent, n) => {
         for (let i = 0; i < n; i++) {
             const result = await new Promise(async (solve, reject) => {

@@ -30,7 +30,7 @@
   "license": "ISC",
   "dependencies": {
     "@mongodb-js/socksv5": "^0.0.10",
-    "@pynk/pynk": "^0.3.6",
+    "@pynk/pynk": "^0.3.11",
     "socks-proxy-agent": "^8.0.5",
     "socksv5": "0.0.6"
   },

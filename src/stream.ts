@@ -10,6 +10,11 @@ export class Stream extends Duplex {
         super({ objectMode: false, allowHalfOpen: false });
     }
 
+    async enableTls(domain: string): Promise<this> {
+        await this.stream.enableTls(domain);
+        return this;
+    }
+
     _read(size: number): void {
         (async () => {
             try {
