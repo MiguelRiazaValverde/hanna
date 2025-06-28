@@ -5,7 +5,7 @@ import * as fluent from './fluent_api';
 import {
     HiddenService, HiddenServiceCallbacks, HiddenServiceConf,
     HiddenServiceConfFluent, HiddenServiceFluent, HiddenServiceHandler,
-    OnionServiceConfFluent, OnionV3Fluent
+    OnionServiceConfFluent, OnionV3Fluent, PortRange
 } from './hidden_service';
 import {
     Auth, Proxy, ProxyAgent, ProxyConf,
@@ -36,6 +36,7 @@ export {
     OnionServiceConfFluent,
     OnionV3Fluent,
     Auth,
+    PortRange,
     Proxy,
     ProxyAgent,
     ProxyConf,
@@ -44,4 +45,3 @@ export {
     ProxyParams,
     Stream,
 };
-

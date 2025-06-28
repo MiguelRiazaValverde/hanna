@@ -1,4 +1,4 @@
-import { OnionService, OnionServiceConfig, OnionV3, RendRequest, StreamRequest, StreamsRequest } from "@pynk/pynk";
+import { OnionService, OnionServiceConfig, OnionV3, RendRequest, StateOnionService, StreamRequest, StreamsRequest } from "@pynk/pynk";
 import { Client, ClientFluent } from "./client";
 import { ensureInstance } from "./utils";
 import { Fluent } from "./fluent";
@@ -6,6 +6,7 @@ import { Stream } from "./stream";
 import * as http from 'http';
 
 
+export type PortRange = '*' | `${number}` | `${number}-${number}`;
 export type HiddenServiceCallbacks = {
     onRendRequest?: (request: RendRequest, hiddenService: HiddenService) => boolean,
     onStreamRequest?: (request: StreamRequest, hiddenService: HiddenService) => boolean,
@@ -114,30 +115,45 @@ export class HiddenService {
         }
     }
 
+    /**
+     * Waits until the hidden service reaches the `Running` state. If `maxTime` is provided, throws an error if the timeout is exceeded.
+     * If the service enters the `Broken` state, throws an error immediately.
+     */
     async waitRunning(maxTime?: number): Promise<this> {
         await this.hiddenService.waitRunning(maxTime);
         return this;
     }
 
-    get address() {
+    /**
+     * Onion address of this service. Clients must know the service's onion address in order to discover or connect to it. Returns `null|undefined` if the HsId of the service could not be found in any of the configured keystores.
+     */
+    get address(): string | null {
         return this.hiddenService.address();
     }
 
-    get state() {
+    /**
+     * Returns the current status of the hidden service.
+     */
+    get state(): StateOnionService {
         return this.hiddenService.state();
     }
 
+    /**
+     * Close the hidden service.
+     */
     close(): this {
         this.hiddenService.close();
         return this;
     }
 
-    addHandler(portRange: string, handler: http.Server | string | number | ((stream: Stream) => void)): this {
+    /**
+     * 
+     */
+    addHandler(portRange: PortRange, handler: http.Server | string | number | ((stream: Stream) => void)): this {
         this.handlers.push(new HiddenServiceHandler(portRange, handler));
         return this;
     }
 }
-
 
 export class HiddenServiceFluent extends Fluent<HiddenService> {
     private conf: HiddenServiceConf | null | HiddenServiceConfFluent = null;
@@ -215,7 +231,7 @@ export class HiddenServiceConfFluent extends Fluent<HiddenServiceConf> {
     /**
      * Adds a handler to the hidden service.
      */
-    handler(portRange: string, handler: http.Server | string | number | ((stream: Stream) => void)): this {
+    handler(portRange: PortRange, handler: http.Server | string | number | ((stream: Stream) => void)): this {
         return this.push(conf => {
             conf.handlers.push(new HiddenServiceHandler(portRange, handler));
         });

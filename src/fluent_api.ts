@@ -14,8 +14,6 @@ export function clientBuilder(): ClientBuilderFluent {
 export function clientConfig(): ClientConfigFluent {
     return new ClientConfigFluent();
 }
-;
-
 
 export function client(torClientBuilder?: TorClientBuilder | ClientBuilderFluent): ClientFluent {
     return ClientFluent.withClientBuilder(torClientBuilder!);
