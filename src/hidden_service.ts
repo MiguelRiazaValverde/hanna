@@ -68,10 +68,14 @@ export class HiddenService {
         client?: Client,
         onionServiceConfig?: OnionServiceConfig,
         callbacks?: HiddenServiceCallbacks,
-        handlers: Array<HiddenServiceHandler> = []
+        onionV3?: OnionV3,
+        handlers: Array<HiddenServiceHandler> = [],
     ) {
         client = client || await Client.create();
-        const onionService = client.client.createOnionService(onionServiceConfig || new OnionServiceConfig());
+        onionServiceConfig = onionServiceConfig || new OnionServiceConfig();
+        const onionService = onionV3
+            ? client.client.createOnionServiceWithKey(onionServiceConfig, onionV3.getSecret())
+            : client.client.createOnionService(onionServiceConfig);
         return new HiddenService(client, onionService, callbacks || {}, handlers);
     }
 
@@ -168,7 +172,7 @@ export class HiddenServiceFluent extends Fluent<HiddenService> {
         const conf = await ensureInstance(this.conf || { handlers: [] });
         const client = await ensureInstance(conf.client!);
         const onionConf = await ensureInstance(conf.onionConf!);
-        return await HiddenService.create(client, onionConf, conf.callbacks, conf.handlers);
+        return await HiddenService.create(client, onionConf, conf.callbacks, conf.onionV3, conf.handlers);
     }
 }
 
@@ -177,6 +181,7 @@ export type HiddenServiceConf = {
     client?: Client | ClientFluent,
     onionConf?: OnionServiceConfig | OnionServiceConfFluent,
     callbacks?: HiddenServiceCallbacks,
+    onionV3?: OnionV3,
     handlers: Array<HiddenServiceHandler>,
 };
 
@@ -234,6 +239,15 @@ export class HiddenServiceConfFluent extends Fluent<HiddenServiceConf> {
     handler(portRange: PortRange, handler: http.Server | string | number | ((stream: Stream) => void)): this {
         return this.push(conf => {
             conf.handlers.push(new HiddenServiceHandler(portRange, handler));
+        });
+    }
+
+    /**
+     * Adds a onion v3 key pair to hidden service.
+     */
+    onionV3(onionV3: OnionV3): this {
+        return this.push(conf => {
+            conf.onionV3 = onionV3;
         });
     }
 }
