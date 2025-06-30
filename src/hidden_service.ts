@@ -172,7 +172,8 @@ export class HiddenServiceFluent extends Fluent<HiddenService> {
         const conf = await ensureInstance(this.conf || { handlers: [] });
         const client = await ensureInstance(conf.client!);
         const onionConf = await ensureInstance(conf.onionConf!);
-        return await HiddenService.create(client, onionConf, conf.callbacks, conf.onionV3, conf.handlers);
+        const onionV3 = await ensureInstance(conf.onionV3!);
+        return await HiddenService.create(client, onionConf, conf.callbacks, onionV3, conf.handlers);
     }
 }
 
@@ -181,7 +182,7 @@ export type HiddenServiceConf = {
     client?: Client | ClientFluent,
     onionConf?: OnionServiceConfig | OnionServiceConfFluent,
     callbacks?: HiddenServiceCallbacks,
-    onionV3?: OnionV3,
+    onionV3?: OnionV3 | OnionV3Fluent,
     handlers: Array<HiddenServiceHandler>,
 };
 
@@ -245,7 +246,7 @@ export class HiddenServiceConfFluent extends Fluent<HiddenServiceConf> {
     /**
      * Adds a onion v3 key pair to hidden service.
      */
-    onionV3(onionV3: OnionV3): this {
+    onionV3(onionV3: OnionV3 | OnionV3Fluent): this {
         return this.push(conf => {
             conf.onionV3 = onionV3;
         });
