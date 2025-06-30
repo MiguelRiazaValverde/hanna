@@ -77,7 +77,7 @@ test('Agent fetch/axios', async t => {
 
 
 test('Agent https fetch/axios', async t => {
-    const agent = await fluent.agentHttps().materialize();
+    const agent = await fluent.agent().materialize();
 
     const axiosResult = await axios.get('https://httpbin.org/ip', {
         httpsAgent: agent

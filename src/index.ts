@@ -12,14 +12,12 @@ import {
     ProxyConfFluent, ProxyFluent, ProxyParams
 } from './proxy';
 import { Stream } from './stream';
-import { Agent, AgentConf, AgentConfFluent, AgentFluent, AgentHttps, AgentHttpsFluent } from './agent';
+import { Agent, AgentConf, AgentConfFluent, AgentFluent } from './agent';
 
 export {
     pynk,
     fluent,
     Agent,
-    AgentHttps,
-    AgentHttpsFluent,
     AgentConf,
     AgentConfFluent,
     AgentFluent,

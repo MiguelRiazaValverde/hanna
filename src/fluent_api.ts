@@ -4,7 +4,7 @@ import { ClientFluent, Client } from "./client";
 import { OnionServiceConfFluent, HiddenServiceConfFluent, HiddenServiceConf, HiddenServiceFluent, OnionV3Fluent } from "./hidden_service";
 import { Auth, ProxyAgent, Proxy, ProxyConfFluent } from "./proxy";
 import { ensureInstance } from "./utils";
-import { AgentConf, AgentConfFluent, AgentFluent, AgentHttpsFluent } from "./agent";
+import { AgentConf, AgentConfFluent, AgentFluent } from "./agent";
 
 
 export function clientBuilder(): ClientBuilderFluent {
@@ -68,8 +68,4 @@ export function agentConf(): AgentConfFluent {
 
 export function agent(conf?: AgentConf | AgentConfFluent): AgentFluent {
     return AgentFluent.withAgentConf(conf);
-}
-
-export function agentHttps(conf?: AgentConf | AgentConfFluent): AgentHttpsFluent {
-    return AgentHttpsFluent.withAgentConf(conf);
 }

@@ -1,14 +1,15 @@
 import * as http from 'http';
-import * as https from 'https';
 import * as stream from 'stream';
 import { Client, ClientFluent } from '.';
 import { Fluent } from './fluent';
 import { ensureInstance } from './utils';
+import { Agent as AgentBase, AgentConnectOpts } from 'agent-base';
 
 
 const hostnameRe = /^(?:https?:\/\/)?([^\/:?#]+)(?:[\/:?#]|$)/i;
 
-export class Agent extends http.Agent {
+
+export class Agent extends AgentBase {
     constructor(public client: Client, opts?: http.AgentOptions) {
         super(opts);
     }
@@ -18,43 +19,11 @@ export class Agent extends http.Agent {
         return new Agent(clientInstance, opts);
     }
 
-    createConnection(options: http.ClientRequestArgs, onCreate: (err: Error | null, socket: stream.Duplex) => void) {
-        (async () => {
-            const match = (options.host || options.hostname || "").match(hostnameRe);
-            const hostname = match ? match[1] : "";
-            try {
-                const socket = await this.client.connectSocket(hostname, parseInt(options.port?.toString() || '0'));
-                onCreate(null, socket);
-            } catch (err) {
-                onCreate(err instanceof Error ? err : new Error(String(err)), null!);
-            }
-        })();
-        return null;
-    }
-}
-
-export class AgentHttps extends https.Agent {
-    constructor(public client: Client, opts?: http.AgentOptions) {
-        super(opts);
-    }
-
-    static async create(client?: Client, opts?: http.AgentOptions) {
-        const clientInstance = client || await Client.create();
-        return new AgentHttps(clientInstance, opts);
-    }
-
-    createConnection(options: http.ClientRequestArgs, onCreate: (err: Error | null, socket: stream.Duplex) => void) {
-        (async () => {
-            const match = (options.host || options.hostname || "").match(hostnameRe);
-            const hostname = match ? match[1] : "";
-            try {
-                const socket = await this.client.connectSocket(hostname, parseInt(options.port?.toString() || '0'), true, true);
-                onCreate(null, socket);
-            } catch (err) {
-                onCreate(err instanceof Error ? err : new Error(String(err)), null!);
-            }
-        })();
-        return null;
+    async connect(req: http.ClientRequest, options: AgentConnectOpts): Promise<stream.Duplex | http.Agent> {
+        const match = (options.host || req.host || "").match(hostnameRe);
+        const hostname = match ? match[1] : "";
+        const socket = await this.client.connectSocket(hostname, parseInt(options.port?.toString() || '0'), true, options.secureEndpoint);
+        return socket;
     }
 }
 
@@ -72,23 +41,6 @@ export class AgentFluent extends Fluent<Agent> {
         const conf = await ensureInstance(this.conf || {});
         let client = await ensureInstance(conf.client!);
         return await Agent.create(client, conf.opts);
-    }
-}
-
-export class AgentHttpsFluent extends Fluent<AgentHttps> {
-
-    private conf: AgentConf | AgentConfFluent | null = null;
-
-    static withAgentConf(conf?: AgentConf | AgentConfFluent): AgentHttpsFluent {
-        const instance = new AgentHttpsFluent();
-        instance.conf = conf || null;
-        return instance;
-    }
-
-    protected async make(): Promise<AgentHttps> {
-        const conf = await ensureInstance(this.conf || {});
-        let client = await ensureInstance(conf.client!);
-        return await AgentHttps.create(client, conf.opts);
     }
 }
 
@@ -123,9 +75,5 @@ export class AgentConfFluent extends Fluent<AgentConf> {
 
     toAgent(): AgentFluent {
         return AgentFluent.withAgentConf(this);
-    }
-
-    toAgentHttps(): AgentHttpsFluent {
-        return AgentHttpsFluent.withAgentConf(this);
     }
 }
